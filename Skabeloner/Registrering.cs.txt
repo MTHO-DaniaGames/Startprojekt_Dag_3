@@ -1,0 +1,8 @@
+builder.Services.AddHttpClient("Books", http =>
+{
+    var address = builder.Configuration["BooksApi:BaseUrl"]
+        ?? throw new InvalidOperationException("BooksApi:BaseUrl mangler.");
+    http.BaseAddress = new Uri(address);
+    http.Timeout = TimeSpan.FromSeconds(5);
+});
+builder.Services.AddScoped<BookApiClient>();

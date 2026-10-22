@@ -1,0 +1,32 @@
+@page "/"
+@rendermode InteractiveServer
+@inject BookRepository Repository
+<PageTitle>Bogkatalog</PageTitle>
+<h1>Bogkatalog</h1>
+<p class="notice">Startversion: Blazor bruger et lokalt repository. Der er endnu ingen forbindelse til API'et.</p>
+<h2>Bøger (@Repository.GetAll().Count)</h2>
+<table><thead><tr><th>Titel</th><th>Forfatter</th><th>Sider</th></tr></thead><tbody>
+@foreach (var book in Repository.GetAll())
+{<tr @key="book.Id"><td>@book.Title</td><td>@book.Author</td><td>@book.Pages</td></tr>}
+</tbody></table>
+<h2>Tilføj en bog</h2>
+<EditForm Model="draft" OnValidSubmit="Save" FormName="add-book">
+<DataAnnotationsValidator />
+<label>Titel<InputText @bind-Value="draft.Title" /></label><ValidationMessage For="() => draft.Title" />
+<label>Forfatter<InputText @bind-Value="draft.Author" /></label><ValidationMessage For="() => draft.Author" />
+<label>Antal sider<InputNumber @bind-Value="draft.Pages" /></label><ValidationMessage For="() => draft.Pages" />
+<button type="submit">Tilføj bog</button>
+</EditForm>
+<p role="status">@message</p>
+@code {
+    private Book draft = new();
+    private string message = "";
+    private void Save() {
+        if (string.IsNullOrWhiteSpace(draft.Title) || string.IsNullOrWhiteSpace(draft.Author)) {
+            message = "Titel og forfatter skal indeholde tekst."; return;
+        }
+        Repository.Add(draft);
+        message = $"Bogen {draft.Title} er tilføjet.";
+        draft = new();
+    }
+}
